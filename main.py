@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from PyPDF2 import PdfWriter, PdfReader
@@ -36,7 +35,8 @@ cards_per_page = num_columns * num_rows
 
 width_margin = get_pdf_width() / 30  # Empty space on the left
 height_margin = get_pdf_height() / 27  # Empty space above
-block_size = (get_pdf_width() - 2 * width_margin) / num_columns + get_pdf_width() / 142
+block_size = (get_pdf_width() - 2 * width_margin) / \
+    num_columns + get_pdf_width() / 142
 space_between_lines = block_size / 8
 
 font_size = 12
@@ -49,7 +49,8 @@ def text_centered_position(index):
     if 0 <= index < cards_per_page:
         index_pos = (int(index / num_columns), index % num_columns)
         width = width_margin + block_size * index_pos[1] + block_size / 2
-        height = height_margin + block_size * index_pos[0] + block_size / 2 + block_size / 23
+        height = height_margin + block_size * \
+            index_pos[0] + block_size / 2 + block_size / 23
 
         return width, height
     else:
@@ -70,7 +71,8 @@ def write_text_to_pdf(text, index, canvas):
         offset = i - len(splited_text) / 2
         if text_centered_position(index) is not None:
             width = text_centered_position(index)[0]
-            height = text_centered_position(index)[1] - offset * space_between_lines
+            height = text_centered_position(
+                index)[1] - offset * space_between_lines
             canvas.drawCentredString(width, height, splited_text[i])
 
 

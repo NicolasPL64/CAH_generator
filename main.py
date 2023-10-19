@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import math
 from PyPDF2 import PdfWriter, PdfReader
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
@@ -88,6 +89,13 @@ can.setFont(font_type, font_size)
 pdf_page_index = 0
 card_index = 0  # Index inside one pdf page
 
+black_pages = 0
+white_pages = 0
+
+black_cards = 0
+white_cards = 0
+
+
 # Black cards
 # black_card_text_color = colors.white
 # can.setFillColor(black_card_text_color)
@@ -98,20 +106,21 @@ for filename in os.listdir(black_cards_dir):
     for line in file_reader:
         write_text_to_pdf(line, card_index, can)
         card_index += 1
+        black_cards += 1
 
         if card_index == cards_per_page:
             card_index = 0
-            pdf_page_index += 1
+            # pdf_page_index += 1
             can.showPage()
             can.setFont(font_type, font_size)
 
 if card_index > 0:
     can.showPage()
     can.setFont(font_type, font_size)
-    pdf_page_index += 1
+    # pdf_page_index += 1
     card_index = 0
 
-num_black_pages = pdf_page_index
+black_pages = math.ceil(black_cards/cards_per_page)
 
 # White cards
 for filename in os.listdir(white_cards_dir):
@@ -121,17 +130,26 @@ for filename in os.listdir(white_cards_dir):
     for line in file_reader:
         write_text_to_pdf(line, card_index, can)
         card_index += 1
+        white_cards += 1
 
         if card_index == cards_per_page:
             card_index = 0
-            pdf_page_index += 1
+            # pdf_page_index += 1
             can.showPage()
             can.setFont(font_type, font_size)
+
+white_pages = math.ceil(white_cards/cards_per_page)
+pdf_page_index = black_pages + white_pages
+
+print(black_pages)
+print(white_pages)
+
 
 can.showPage()
 can.save()
 
 print("All files have been read.")
+
 
 # Add the watermarks and create final pdf
 new_pdf = PdfReader(packet)
@@ -140,7 +158,7 @@ output = PdfWriter()
 print("PDF pages generated (out of " + str(pdf_page_index) + "):", end='', flush=True)
 for i in range(pdf_page_index):
     existing_pdf = None
-    if i < num_black_pages:
+    if i < black_pages:
         existing_pdf = PdfReader(open("./Input/CAH_BlankBlackCards.pdf", "rb"))
     else:
         existing_pdf = PdfReader(open("./Input/CAH_BlankWhiteCards.pdf", "rb"))

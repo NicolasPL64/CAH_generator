@@ -5,7 +5,7 @@ This program generates a PDF with cards for the game [Cards Against Humanity](ht
 
 ## Usage
 
-File(s) with sentences must be placed inside **Input/BlackCards** and **Input/WhiteCards** respectively (one sentence per line). 
+File(s) with sentences must be placed inside **Input/BlackCards** and **Input/WhiteCards** respectively (one sentence per line). Multiple files can be placed in their respective folders.
 
 Install program dependencies
 
@@ -25,7 +25,7 @@ Given these files *Input/BlackCards/example.txt* and *Output/WhiteCards/example.
 ![Cards](./cards.png)
 
 ## Why?
-I didn't want to waste 10 minutes writing cards into a PDF then I thought that it would be a great idea to waste one day writing a program to make it automatically.
+I didn't want to waste 10 minutes writing cards into a PDF, so I thought that it would be a great idea to waste one day writing a program to make it automatically.
 
 ## License
 Creative Commons BY-NC-SA 2.0

@@ -4,6 +4,7 @@ import math
 from PyPDF2 import PdfWriter, PdfReader
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
 import textwrap
 import io
 import os
@@ -47,6 +48,7 @@ font_type = "Helvetica-Bold"
 def text_centered_position(index):
     # Return text position inside a one page pdf
     index = (cards_per_page - index - 1)
+
     if 0 <= index < cards_per_page:
         index_pos = (int(index / num_columns), index % num_columns)
         width = width_margin + block_size * index_pos[1] + block_size / 2
@@ -69,12 +71,12 @@ def write_text_to_pdf(text, index, canvas):
     splited_text = split_text(text)
 
     for i in range(len(splited_text)):
-        offset = i - len(splited_text) / 2
         if text_centered_position(index) is not None:
-            width = text_centered_position(index)[0]
+            width = text_centered_position(
+                index)[0] - 59
             height = text_centered_position(
-                index)[1] - offset * space_between_lines
-            canvas.drawCentredString(width, height, splited_text[i])
+                index)[1] - i * space_between_lines + 50
+            canvas.drawString(width, height, splited_text[i])
 
 
 black_cards_dir = "./Input/BlackCards/"
@@ -97,13 +99,13 @@ white_cards = 0
 
 
 # Black cards
-# black_card_text_color = colors.white
-# can.setFillColor(black_card_text_color)
+
 for filename in os.listdir(black_cards_dir):
     path = black_cards_dir + filename
     file_reader = open(path, "r")
 
     for line in file_reader:
+        can.setFillColor(colors.white)
         write_text_to_pdf(line, card_index, can)
         card_index += 1
         black_cards += 1
@@ -155,9 +157,9 @@ print("PDF pages generated (out of " + str(pdf_page_index) + "):", end='', flush
 for i in range(pdf_page_index):
     existing_pdf = None
     if i < black_pages:
-        existing_pdf = PdfReader(open("./Input/CAH_BlankBlackCards.pdf", "rb"))
+        existing_pdf = PdfReader(open("./Input/blank-black.pdf", "rb"))
     else:
-        existing_pdf = PdfReader(open("./Input/CAH_BlankWhiteCards.pdf", "rb"))
+        existing_pdf = PdfReader(open("./Input/blank-white.pdf", "rb"))
 
     page = existing_pdf.pages[0]
     page.merge_page(new_pdf.pages[i])

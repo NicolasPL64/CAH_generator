@@ -51,9 +51,9 @@ def text_centered_position(index):
 
     if 0 <= index < cards_per_page:
         index_pos = (int(index / num_columns), index % num_columns)
-        width = width_margin + block_size * index_pos[1] + block_size / 2
+        width = width_margin + block_size * index_pos[1]
         height = height_margin + block_size * \
-            index_pos[0] + block_size / 2 + block_size / 23
+            index_pos[0] + block_size / 23
 
         return width, height
     else:
@@ -61,7 +61,7 @@ def text_centered_position(index):
 
 
 def split_text(text):
-    """Split text in several lines"""
+    # Split text in several lines
     # TODO: Be careful if just one word is split
     return textwrap.wrap(text, width=18)
 
@@ -73,9 +73,9 @@ def write_text_to_pdf(text, index, canvas):
     for i in range(len(splited_text)):
         if text_centered_position(index) is not None:
             width = text_centered_position(
-                index)[0] - 59
+                index)[0] + 13
             height = text_centered_position(
-                index)[1] - i * space_between_lines + 50
+                index)[1] - i * space_between_lines + 121
             canvas.drawString(width, height, splited_text[i])
 
 
@@ -112,14 +112,12 @@ for filename in os.listdir(black_cards_dir):
 
         if card_index == cards_per_page:
             card_index = 0
-            # pdf_page_index += 1
             can.showPage()
             can.setFont(font_type, font_size)
 
 if card_index > 0:
     can.showPage()
     can.setFont(font_type, font_size)
-    # pdf_page_index += 1
     card_index = 0
 
 black_pages = math.ceil(black_cards/cards_per_page)
@@ -136,7 +134,6 @@ for filename in os.listdir(white_cards_dir):
 
         if card_index == cards_per_page:
             card_index = 0
-            # pdf_page_index += 1
             can.showPage()
             can.setFont(font_type, font_size)
 

@@ -101,7 +101,7 @@ white_cards = 0
 # can.setFillColor(black_card_text_color)
 for filename in os.listdir(black_cards_dir):
     path = black_cards_dir + filename
-    file_reader = open(path, "r")
+    file_reader = open(path, "r", encoding="utf-8")
 
     for line in file_reader:
         write_text_to_pdf(line, card_index, can)
@@ -125,7 +125,7 @@ black_pages = math.ceil(black_cards/cards_per_page)
 # White cards
 for filename in os.listdir(white_cards_dir):
     path = white_cards_dir + filename
-    file_reader = open(path, "r")
+    file_reader = open(path, "r", encoding="utf-8")
 
     for line in file_reader:
         write_text_to_pdf(line, card_index, can)

@@ -107,7 +107,6 @@ for filename in os.listdir(black_cards_dir):
 
     for line in file_reader:
         can.setFillColor(colors.white)
-        print(line)
         write_text_to_pdf(line, card_index, can)
         card_index += 1
         black_cards += 1

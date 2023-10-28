@@ -1,0 +1,5 @@
+Special characters test ñ © á ü ™
+<i>Italics</i> testing
+Break<br/>line<br/>test
+Long word test: Otorhinolaryngology
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sagittis ut elit vel venenatis. Phasellus quis semper risus.

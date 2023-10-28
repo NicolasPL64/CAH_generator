@@ -73,7 +73,6 @@ def split_text(text):
 
 def write_text_to_pdf(text, index, canvas):
     # Draw text inside a pdf using canvas
-
     parag = Paragraph(text, stylo)
     parag.wrapOn(can, block_width - 23, block_height)
     parag.drawOn(can, text_centered_position(index)[0] + 13,

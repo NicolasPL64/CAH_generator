@@ -2,6 +2,10 @@ import math
 from PyPDF2 import PdfWriter, PdfReader
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.platypus import Paragraph
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.pdfbase.pdfmetrics import registerFontFamily
 import textwrap
 import io
 import os
@@ -41,6 +45,9 @@ space_between_lines = block_size / 8
 font_size = 12
 font_type = "Helvetica-Bold"
 
+registerFontFamily('Helvetica', normal='Helvetica-Bold', bold='Helvetica-Bold',
+                   italic='Helvetica-BoldOblique', boldItalic='Helvetica-BoldOblique')
+
 
 def text_centered_position(index):
     # Return text position inside a one page pdf
@@ -64,8 +71,13 @@ def split_text(text):
 
 def write_text_to_pdf(text, index, canvas):
     # Draw text inside a pdf using canvas
-    splited_text = split_text(text)
+    parag = Paragraph(text, stylo)
+    parag.wrapOn(can, block_size - 25, block_size)
+    parag.drawOn(can, text_centered_position(index)[0] - 59,
+                 text_centered_position(index)[1] - len(parag.blPara.lines) / 2 * space_between_lines + 16)
 
+
+""" 
     for i in range(len(splited_text)):
         offset = i - len(splited_text) / 2
         if text_centered_position(index) is not None:
@@ -73,7 +85,7 @@ def write_text_to_pdf(text, index, canvas):
             height = text_centered_position(
                 index)[1] - offset * space_between_lines
             canvas.drawCentredString(width, height, splited_text[i])
-
+ """
 
 black_cards_dir = "./Input/BlackCards/"
 white_cards_dir = "./Input/WhiteCards/"
@@ -93,10 +105,10 @@ white_pages = 0
 black_cards = 0
 white_cards = 0
 
+stylo = ParagraphStyle("estilo", fontName="Helvetica", fontSize=12, alignment=1,
+                       leading=space_between_lines, borderWidth=0, borderColor=colors.black)
 
 # Black cards
-# black_card_text_color = colors.white
-# can.setFillColor(black_card_text_color)
 for filename in os.listdir(black_cards_dir):
     path = black_cards_dir + filename
     file_reader = open(path, "r", encoding="utf-8")
@@ -108,14 +120,12 @@ for filename in os.listdir(black_cards_dir):
 
         if card_index == cards_per_page:
             card_index = 0
-            # pdf_page_index += 1
             can.showPage()
             can.setFont(font_type, font_size)
 
 if card_index > 0:
     can.showPage()
     can.setFont(font_type, font_size)
-    # pdf_page_index += 1
     card_index = 0
 
 black_pages = math.ceil(black_cards/cards_per_page)
@@ -132,7 +142,6 @@ for filename in os.listdir(white_cards_dir):
 
         if card_index == cards_per_page:
             card_index = 0
-            # pdf_page_index += 1
             can.showPage()
             can.setFont(font_type, font_size)
 

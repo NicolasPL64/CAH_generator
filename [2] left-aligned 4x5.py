@@ -3,6 +3,9 @@ from PyPDF2 import PdfWriter, PdfReader
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
+from reportlab.platypus import Paragraph
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.pdfbase.pdfmetrics import registerFontFamily
 import textwrap
 import io
 import os
@@ -42,6 +45,9 @@ space_between_lines = block_size / 8
 font_size = 12
 font_type = "Helvetica-Bold"
 
+registerFontFamily('Helvetica', normal='Helvetica-Bold', bold='Helvetica-Bold',
+                   italic='Helvetica-BoldOblique', boldItalic='Helvetica-BoldOblique')
+
 
 def text_centered_position(index):
     # Return text position inside a one page pdf
@@ -66,15 +72,10 @@ def split_text(text):
 
 def write_text_to_pdf(text, index, canvas):
     # Draw text inside a pdf using canvas
-    splited_text = split_text(text)
-
-    for i in range(len(splited_text)):
-        if text_centered_position(index) is not None:
-            width = text_centered_position(
-                index)[0] + 13
-            height = text_centered_position(
-                index)[1] - i * space_between_lines + 121
-            canvas.drawString(width, height, splited_text[i])
+    parag = Paragraph(text, stylo)
+    parag.wrapOn(can, block_size - 26, block_size)
+    parag.drawOn(can, text_centered_position(index)[0] + 13,
+                 text_centered_position(index)[1] - len(parag.blPara.lines) * space_between_lines + 133)
 
 
 black_cards_dir = "./Input/BlackCards/"
@@ -97,13 +98,14 @@ white_cards = 0
 
 
 # Black cards
+stylo = ParagraphStyle("estilo", fontName="Helvetica", fontSize=12, textColor=colors.white,
+                       leading=space_between_lines, borderWidth=0, borderColor=colors.white)
 
 for filename in os.listdir(black_cards_dir):
     path = black_cards_dir + filename
     file_reader = open(path, "r", encoding="utf-8")
 
     for line in file_reader:
-        can.setFillColor(colors.white)
         write_text_to_pdf(line, card_index, can)
         card_index += 1
         black_cards += 1
@@ -121,6 +123,9 @@ if card_index > 0:
 black_pages = math.ceil(black_cards/cards_per_page)
 
 # White cards
+stylo = ParagraphStyle("estilo", fontName="Helvetica", fontSize=12, textColor=colors.black,
+                       leading=space_between_lines, borderWidth=0, borderColor=colors.black)
+
 for filename in os.listdir(white_cards_dir):
     path = white_cards_dir + filename
     file_reader = open(path, "r", encoding="utf-8")

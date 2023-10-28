@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import math
 from PyPDF2 import PdfWriter, PdfReader
 from reportlab.pdfgen import canvas

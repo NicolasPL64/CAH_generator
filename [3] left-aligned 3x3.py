@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
-
 import math
 from PyPDF2 import PdfWriter, PdfReader
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
+from reportlab.platypus import Paragraph
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.pdfbase.pdfmetrics import registerFontFamily
 import textwrap
 import io
 import os
@@ -40,10 +41,13 @@ height_margin = get_pdf_height() * (3 / 110)  # Empty space above
 block_width = (get_pdf_width() - 2 * width_margin) / \
     num_columns + get_pdf_width() / 142
 block_height = block_width * 1.38  # Aspect ratio for card size
-space_between_lines = block_width / 8
+space_between_lines = block_width / 9
 
 font_size = 12
 font_type = "Helvetica-Bold"
+
+registerFontFamily('Helvetica', normal='Helvetica-Bold', bold='Helvetica-Bold',
+                   italic='Helvetica-BoldOblique', boldItalic='Helvetica-BoldOblique')
 
 
 def text_centered_position(index):
@@ -69,15 +73,11 @@ def split_text(text):
 
 def write_text_to_pdf(text, index, canvas):
     # Draw text inside a pdf using canvas
-    splited_text = split_text(text)
 
-    for i in range(len(splited_text)):
-        if text_centered_position(index) is not None:
-            width = text_centered_position(
-                index)[0] + 13
-            height = text_centered_position(
-                index)[1] - i * space_between_lines + 94
-            canvas.drawString(width, height, splited_text[i])
+    parag = Paragraph(text, stylo)
+    parag.wrapOn(can, block_width - 23, block_height)
+    parag.drawOn(can, text_centered_position(index)[0] + 13,
+                 text_centered_position(index)[1] - len(parag.blPara.lines) * space_between_lines + 106)
 
 
 black_cards_dir = "./Input/BlackCards/"
@@ -98,15 +98,15 @@ white_pages = 0
 black_cards = 0
 white_cards = 0
 
-
 # Black cards
+stylo = ParagraphStyle("estilo", fontName="Helvetica", fontSize=12, textColor=colors.white,
+                       leading=space_between_lines, borderWidth=0, borderColor=colors.white)
 
 for filename in os.listdir(black_cards_dir):
     path = black_cards_dir + filename
     file_reader = open(path, "r", encoding="utf-8")
 
     for line in file_reader:
-        can.setFillColor(colors.white)
         write_text_to_pdf(line, card_index, can)
         card_index += 1
         black_cards += 1
@@ -124,6 +124,9 @@ if card_index > 0:
 black_pages = math.ceil(black_cards/cards_per_page)
 
 # White cards
+stylo = ParagraphStyle("estilo", fontName="Helvetica", fontSize=12, textColor=colors.black,
+                       leading=space_between_lines, borderWidth=0, borderColor=colors.black)
+
 for filename in os.listdir(white_cards_dir):
     path = white_cards_dir + filename
     file_reader = open(path, "r", encoding="utf-8")

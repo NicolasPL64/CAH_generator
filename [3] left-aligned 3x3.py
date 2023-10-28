@@ -6,7 +6,6 @@ from reportlab.lib import colors
 from reportlab.platypus import Paragraph
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
-import textwrap
 import io
 import os
 import datetime
@@ -15,7 +14,6 @@ import sys
 # Avoid warning
 if not sys.warnoptions:
     import warnings
-
     warnings.simplefilter("ignore")
 
 
@@ -43,15 +41,12 @@ block_width = (get_pdf_width() - 2 * width_margin) / \
 block_height = block_width * 1.38  # Aspect ratio for card size
 space_between_lines = block_width / 9
 
-font_size = 12
-font_type = "Helvetica-Bold"
-
 registerFontFamily('Helvetica', normal='Helvetica-Bold', bold='Helvetica-Bold',
                    italic='Helvetica-BoldOblique', boldItalic='Helvetica-BoldOblique')
 
 
 def text_centered_position(index):
-    # Return text position inside a one page pdf
+    # Return textbox position inside a one page pdf
     index = (cards_per_page - index - 1)
 
     if 0 <= index < cards_per_page:
@@ -63,12 +58,6 @@ def text_centered_position(index):
         return width, height
     else:
         return None
-
-
-def split_text(text):
-    # Split text in several lines
-    # TODO: Be careful if just one word is split
-    return textwrap.wrap(text, width=25)
 
 
 def write_text_to_pdf(text, index, canvas):
@@ -86,7 +75,6 @@ packet = io.BytesIO()
 
 # Create a new PDF with Reportlab
 can = canvas.Canvas(packet, pagesize=A4)
-can.setFont(font_type, font_size)
 
 pdf_page_index = 0
 card_index = 0  # Index inside one pdf page
@@ -98,8 +86,8 @@ black_cards = 0
 white_cards = 0
 
 # Black cards
-stylo = ParagraphStyle("estilo", fontName="Helvetica", fontSize=12, textColor=colors.white,
-                       leading=space_between_lines, borderWidth=0, borderColor=colors.white)
+stylo = ParagraphStyle("estilo", fontName="Helvetica", fontSize=12,
+                       textColor=colors.white, leading=space_between_lines)
 
 for filename in os.listdir(black_cards_dir):
     path = black_cards_dir + filename
@@ -113,18 +101,17 @@ for filename in os.listdir(black_cards_dir):
         if card_index == cards_per_page:
             card_index = 0
             can.showPage()
-            can.setFont(font_type, font_size)
 
 if card_index > 0:
     can.showPage()
-    can.setFont(font_type, font_size)
+
     card_index = 0
 
 black_pages = math.ceil(black_cards/cards_per_page)
 
 # White cards
-stylo = ParagraphStyle("estilo", fontName="Helvetica", fontSize=12, textColor=colors.black,
-                       leading=space_between_lines, borderWidth=0, borderColor=colors.black)
+stylo = ParagraphStyle("estilo", fontName="Helvetica", fontSize=12,
+                       textColor=colors.black, leading=space_between_lines)
 
 for filename in os.listdir(white_cards_dir):
     path = white_cards_dir + filename
@@ -138,7 +125,6 @@ for filename in os.listdir(white_cards_dir):
         if card_index == cards_per_page:
             card_index = 0
             can.showPage()
-            can.setFont(font_type, font_size)
 
 white_pages = math.ceil(white_cards/cards_per_page)
 pdf_page_index = black_pages + white_pages
@@ -149,7 +135,7 @@ can.save()
 print("All files have been read.")
 
 
-# Add the watermarks and create final pdf
+# Merge the pdfs
 new_pdf = PdfReader(packet)
 output = PdfWriter()
 

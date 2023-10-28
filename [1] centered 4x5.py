@@ -2,11 +2,9 @@ import math
 from PyPDF2 import PdfWriter, PdfReader
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
-from reportlab.lib import colors
 from reportlab.platypus import Paragraph
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.pdfbase.pdfmetrics import registerFontFamily
-import textwrap
 import io
 import os
 import datetime
@@ -15,7 +13,6 @@ import sys
 # Avoid warning
 if not sys.warnoptions:
     import warnings
-
     warnings.simplefilter("ignore")
 
 
@@ -42,16 +39,17 @@ block_size = (get_pdf_width() - 2 * width_margin) / \
     num_columns + get_pdf_width() / 142
 space_between_lines = block_size / 8
 
-font_size = 12
-font_type = "Helvetica-Bold"
-
 registerFontFamily('Helvetica', normal='Helvetica-Bold', bold='Helvetica-Bold',
                    italic='Helvetica-BoldOblique', boldItalic='Helvetica-BoldOblique')
 
+stylo = ParagraphStyle("estilo", fontName="Helvetica",
+                       fontSize=12, alignment=1, leading=space_between_lines)
+
 
 def text_centered_position(index):
-    # Return text position inside a one page pdf
+    # Return textbox position inside a one page pdf
     index = (cards_per_page - index - 1)
+
     if 0 <= index < cards_per_page:
         index_pos = (int(index / num_columns), index % num_columns)
         width = width_margin + block_size * index_pos[1] + block_size / 2
@@ -63,12 +61,6 @@ def text_centered_position(index):
         return None
 
 
-def split_text(text):
-    """Split text in several lines"""
-    # TODO: Be careful if just one word is split
-    return textwrap.wrap(text, width=18)
-
-
 def write_text_to_pdf(text, index, canvas):
     # Draw text inside a pdf using canvas
     parag = Paragraph(text, stylo)
@@ -77,16 +69,6 @@ def write_text_to_pdf(text, index, canvas):
                  text_centered_position(index)[1] - len(parag.blPara.lines) / 2 * space_between_lines + 16)
 
 
-""" 
-    for i in range(len(splited_text)):
-        offset = i - len(splited_text) / 2
-        if text_centered_position(index) is not None:
-            width = text_centered_position(index)[0]
-            height = text_centered_position(
-                index)[1] - offset * space_between_lines
-            canvas.drawCentredString(width, height, splited_text[i])
- """
-
 black_cards_dir = "./Input/BlackCards/"
 white_cards_dir = "./Input/WhiteCards/"
 
@@ -94,7 +76,6 @@ packet = io.BytesIO()
 
 # Create a new PDF with Reportlab
 can = canvas.Canvas(packet, pagesize=A4)
-can.setFont(font_type, font_size)
 
 pdf_page_index = 0
 card_index = 0  # Index inside one pdf page
@@ -104,9 +85,6 @@ white_pages = 0
 
 black_cards = 0
 white_cards = 0
-
-stylo = ParagraphStyle("estilo", fontName="Helvetica", fontSize=12, alignment=1,
-                       leading=space_between_lines, borderWidth=0, borderColor=colors.black)
 
 # Black cards
 for filename in os.listdir(black_cards_dir):
@@ -121,11 +99,9 @@ for filename in os.listdir(black_cards_dir):
         if card_index == cards_per_page:
             card_index = 0
             can.showPage()
-            can.setFont(font_type, font_size)
 
 if card_index > 0:
     can.showPage()
-    can.setFont(font_type, font_size)
     card_index = 0
 
 black_pages = math.ceil(black_cards/cards_per_page)
@@ -143,7 +119,6 @@ for filename in os.listdir(white_cards_dir):
         if card_index == cards_per_page:
             card_index = 0
             can.showPage()
-            can.setFont(font_type, font_size)
 
 white_pages = math.ceil(white_cards/cards_per_page)
 pdf_page_index = black_pages + white_pages
@@ -154,7 +129,7 @@ can.save()
 print("All files have been read.")
 
 
-# Add the watermarks and create final pdf
+# Merge the pdfs
 new_pdf = PdfReader(packet)
 output = PdfWriter()
 

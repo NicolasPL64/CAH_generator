@@ -1,3 +1,4 @@
 # Project files
-Output/
+Output/*
+!Output/.gitkeep
 .vscode/

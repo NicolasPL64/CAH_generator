@@ -6,7 +6,7 @@ This program generates a ready-to-print PDF with cards for the game [Cards Again
 
 - 3 different variations (examples down below)
 - Support for special characters
-- Support for HTML tags (like \<b>, \<i> or \<br/>)
+- Support for HTML tags (like \<i> or \<br/>)
 - Improved the line-splitting method
 - Lots of bugs fixed!
 
